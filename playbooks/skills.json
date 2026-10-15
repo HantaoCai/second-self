@@ -1,0 +1,23 @@
+[
+  {
+    "id": "write_review",
+    "risk": "draft",
+    "expose": true,
+    "lines": ["bond", "capital", "craft", "identity"],
+    "description": "把这次处境写成一段复盘，先不行动"
+  },
+  {
+    "id": "read_lessons",
+    "risk": "read",
+    "expose": true,
+    "lines": ["*"],
+    "description": "只重读已经生效的教训，不新增动作"
+  },
+  {
+    "id": "place_order",
+    "risk": "act",
+    "expose": true,
+    "lines": ["capital"],
+    "description": "下单。即使标了暴露，也不准进入决策选项。"
+  }
+]

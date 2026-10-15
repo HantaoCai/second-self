@@ -1,0 +1,29 @@
+{
+  "title": "示例：一条新闻打到一个主题",
+  "beats": [
+    {
+      "id": "news-rule",
+      "kind": "news",
+      "title": "示例行业突然被加强监管",
+      "body": "这是你自己写的新闻，不是真事。",
+      "causes": [],
+      "hits": ["主题:示例行业"]
+    },
+    {
+      "id": "mkt-drop",
+      "kind": "market",
+      "title": "相关板块下跌",
+      "body": "资金先卖最纯的标的。",
+      "causes": ["news-rule"],
+      "hits": ["主题:示例行业"]
+    },
+    {
+      "id": "hit-hold",
+      "kind": "impact",
+      "title": "打到你是否还拿着这个主题",
+      "body": "波动本身不是教训。你事后怎么做，才写回自己的经历。",
+      "causes": ["mkt-drop"],
+      "hits": ["事情:还拿不拿示例行业"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[project]
+name = "second-self"
+version = "0.1.0"
+description = "一个人一份的第二自我：经历、教训、决策和可编写的世界分开。"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+selfos = "selfos.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
