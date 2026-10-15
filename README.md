@@ -29,6 +29,12 @@ adapters/        Jev、以后的记忆系统。换掉不影响本体。
 
 别人要养自己的助手：克隆这个仓库，在自己的机器上运行 `init`。世界包可以共用。谁的经历都留在自己的 `~/.second-self`，不进公开仓库。换目录用 `SELF_ROOT` 或 `--root`。
 
+## 工作还是聊一聊
+
+在 Cursor 里默认是工作：改代码，不读私人目录。
+
+要聊个人经历、教训、感情、投资，说「聊一聊」或点名 skill `chat-self`。那时才会召回 `~/.second-self`。说「回到工作」就停。
+
 ## 你怎么往里添材料
 
 ```bash
@@ -51,12 +57,20 @@ python3 -m selfos adopt --person 某人 --note <note id> --line capital \
 
 `--file` 可以代替 `--body`。特别私密的原文放 `~/.second-self/private/`。整个个人目录都不在这个仓库里。
 
+把 Google Takeout 的 Gemini 活动收进经历（你的话）和 note（Gemini 的回复）。不会自动变成教训：
+
+```bash
+python3 -m selfos import-gemini
+```
+
 召回和决策：
 
 ```bash
 python3 -m selfos recall --line capital --query "下跌 情绪"
 python3 -m selfos decide --playbook capital_review --situation "相关板块今天跌了"
 ```
+
+`recall` 分三栏：`mine`（教训）、`lived`（经历）、`borrowed`（别人的话）。
 
 没配 `TYPESAFE_API_KEY` 时，`decide` 只交出简报：用上了哪些教训、选项有哪些。它不会编一个选择。配了 key 且安装 `typesafe-sdk` 后，才走 Jev。本地的 Kev 只要兼容 TypeSafe System One，改 `TYPESAFE_BASE_URL` 即可。置信度低于剧本里的门槛，结果是 `needs_human`。
 

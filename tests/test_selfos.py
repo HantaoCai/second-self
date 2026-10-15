@@ -7,6 +7,7 @@ from pathlib import Path
 
 from selfos.__main__ import main
 from selfos.decide import UnavailableDecision, choice_criteria, decide, load_json
+from selfos.importers.gemini import guess_line, import_gemini
 from selfos.recall import recall
 from selfos.store import Store, StoreError, default_root
 from selfos.world import chain_text, load_pack, record_reaction
@@ -181,6 +182,48 @@ class Invariants(unittest.TestCase):
         other.init()
         self.store.add_episode(line="bond", title="我的", body="只属于这一份 corpus")
         self.assertEqual(other.episodes(), [])
+
+    def test_recall_returns_lived_episodes(self) -> None:
+        episode = self.store.add_episode(line="capital", title="割在地板", body="恐慌那天清仓")
+        found = recall(self.store, "恐慌 清仓")
+        self.assertEqual(found.mine, [])
+        self.assertEqual(found.lived[0].id, episode.id)
+
+    def test_gemini_import_is_idempotent_and_not_a_lesson(self) -> None:
+        export = Path(self.tmp.name) / "activity.json"
+        export.write_text(
+            json.dumps(
+                [
+                    {
+                        "header": "Gemini Apps",
+                        "title": "Prompted 股票跌了要不要清仓",
+                        "time": "2026-01-02T03:04:05.000Z",
+                        "details": [{"name": "https://gemini.google.com/app/abc123"}],
+                        "safeHtmlItem": [{"html": "<p>先看是不是情绪，不要马上清仓。</p>"}],
+                    },
+                    {
+                        "header": "Gemini Apps",
+                        "title": "Cleared previous conversation",
+                        "time": "2026-01-02T03:05:05.000Z",
+                        "details": [],
+                        "safeHtmlItem": [],
+                    },
+                ],
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        first = import_gemini(self.store, export)
+        second = import_gemini(self.store, export)
+        self.assertEqual(first.episodes, 1)
+        self.assertEqual(first.notes, 1)
+        self.assertEqual(first.skipped, 1)
+        self.assertEqual(second.already, 1)
+        self.assertEqual(second.episodes, 0)
+        self.assertEqual(self.store.lessons(), [])
+        self.assertEqual(self.store.episodes()[0].line, "capital")
+        self.assertEqual(self.store.notes()[0].person, "Gemini")
+        self.assertEqual(guess_line("我和对象吵架了"), "bond")
 
 
 if __name__ == "__main__":

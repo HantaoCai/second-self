@@ -84,6 +84,10 @@ def decide(
             }
             for row in found.mine
         ],
+        "lived": [
+            {"id": row.id, "line": row.line, "title": row.title, "body": row.body}
+            for row in found.lived
+        ],
         "borrowed": [
             {"person": row.person, "title": row.title, "body": row.body}
             for row in found.borrowed

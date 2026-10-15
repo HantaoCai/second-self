@@ -7,6 +7,7 @@ from pathlib import Path
 
 from selfos.adapters.jev import JevDecision
 from selfos.decide import decide, default_playbook_dir, load_json
+from selfos.importers.gemini import default_export_path, import_gemini
 from selfos.recall import recall
 from selfos.store import Store, default_root
 from selfos.world import chain_text, load_pack, record_reaction
@@ -51,10 +52,14 @@ def main(argv: list[str] | None = None) -> int:
     adopt.add_argument("--because", required=True)
     adopt.add_argument("--supersedes")
 
-    recall_cmd = sub.add_parser("recall", help="分开召回我的教训和别人的话")
+    recall_cmd = sub.add_parser("recall", help="分开召回教训、经历和别人的话")
     _add_root(recall_cmd)
     recall_cmd.add_argument("--query", required=True)
     recall_cmd.add_argument("--line")
+
+    import_cmd = sub.add_parser("import-gemini", help="把 Gemini 活动导出收进经历与 note，不自动收成教训")
+    _add_root(import_cmd)
+    import_cmd.add_argument("--file", help="活动记录 JSON，默认读私人目录里的导出")
 
     decide_cmd = sub.add_parser("decide", help="在允许的动作里做一次选择")
     _add_root(decide_cmd)
@@ -135,9 +140,16 @@ def _run(args: argparse.Namespace) -> int:
         found = recall(store, args.query, line=args.line)
         payload = {
             "mine": [row.to_dict() for row in found.mine],
+            "lived": [row.to_dict() for row in found.lived],
             "borrowed": [row.to_dict() for row in found.borrowed],
         }
         print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
+    if args.cmd == "import-gemini":
+        store.init()
+        path = Path(args.file).expanduser() if args.file else default_export_path(store.root)
+        result = import_gemini(store, path)
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
         return 0
     if args.cmd == "decide":
         playbook = load_json(_playbook_path(args.playbook))
