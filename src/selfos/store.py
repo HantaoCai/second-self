@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import fields
 from datetime import date
 from pathlib import Path
@@ -17,6 +18,14 @@ from selfos.models import (
 
 class StoreError(ValueError):
     pass
+
+
+def default_root() -> Path:
+    """个人内容的默认位置。在仓库外面，避免随公开代码一起推上去。"""
+    chosen = os.environ.get("SELF_ROOT", "").strip()
+    if chosen:
+        return Path(chosen).expanduser()
+    return Path.home() / ".second-self"
 
 
 class Store:

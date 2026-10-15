@@ -8,7 +8,7 @@ from pathlib import Path
 from selfos.adapters.jev import JevDecision
 from selfos.decide import decide, default_playbook_dir, load_json
 from selfos.recall import recall
-from selfos.store import Store
+from selfos.store import Store, default_root
 from selfos.world import chain_text, load_pack, record_reaction
 
 
@@ -16,8 +16,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="selfos", description="第二自我")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    init_cmd = sub.add_parser("init", help="准备一份空的个人 corpus")
-    init_cmd.add_argument("--root", default="corpus")
+    init_cmd = sub.add_parser("init", help="准备一份空的个人目录")
+    _add_root(init_cmd)
 
     ingest = sub.add_parser("ingest", help="记下一段我的经历")
     _add_root(ingest)
@@ -93,7 +93,7 @@ def _run(args: argparse.Namespace) -> int:
         print(ordered)
         return 0
 
-    store = Store(args.root)
+    store = Store(_root(args))
     if args.cmd == "init":
         store.init()
         print(store.root)
@@ -159,7 +159,13 @@ def _run(args: argparse.Namespace) -> int:
 
 
 def _add_root(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--root", default="corpus")
+    parser.add_argument("--root", default=None, help="个人内容目录，默认 ~/.second-self")
+
+
+def _root(args: argparse.Namespace) -> Path:
+    if args.root:
+        return Path(args.root).expanduser()
+    return default_root()
 
 
 def _body(text: str | None, file_path: str | None) -> str:

@@ -5,4 +5,5 @@
 __pycache__/
 *.pyc
 .DS_Store
-corpus/private/
+# 个人内容。放进仓库目录也不会被提交。
+corpus/

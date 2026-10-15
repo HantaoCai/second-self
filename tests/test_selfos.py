@@ -8,7 +8,7 @@ from pathlib import Path
 from selfos.__main__ import main
 from selfos.decide import UnavailableDecision, choice_criteria, decide, load_json
 from selfos.recall import recall
-from selfos.store import Store, StoreError
+from selfos.store import Store, StoreError, default_root
 from selfos.world import chain_text, load_pack, record_reaction
 
 
@@ -163,6 +163,18 @@ class Invariants(unittest.TestCase):
         self.assertEqual(main(["init", "--root", str(root)]), 0)
         self.assertTrue((root / "identity" / "principles.md").is_file())
         self.assertEqual(main(["world", "play", "--pack", "sample-shock"]), 0)
+
+    def test_default_root_stays_outside_the_repo(self) -> None:
+        import os
+
+        old = os.environ.pop("SELF_ROOT", None)
+        try:
+            root = default_root()
+        finally:
+            if old is not None:
+                os.environ["SELF_ROOT"] = old
+        self.assertFalse(root.is_relative_to(ROOT))
+        self.assertEqual(root, Path.home() / ".second-self")
 
     def test_each_store_is_its_own_person(self) -> None:
         other = Store(Path(self.tmp.name) / "someone-else")
